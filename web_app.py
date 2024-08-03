@@ -23,7 +23,7 @@ def getTextByContractAddress(ctx_addr):
     return currentStoredText
 
 
-from flask import Flask
+from flask import Flask, request
 app = Flask(__name__)
 
 @app.route("/")
@@ -31,3 +31,16 @@ def index():
     
     stored_text = getTextByContractAddress(contract_address)   
     return stored_text
+
+
+@app.route("/get_text_by_ctx_addr", methods=['GET'])
+def getTextByCtxAddr():
+    
+    returned_text = ''
+    if request.method == 'GET':  
+        ctx_addr = request.args['ctx_addr']
+        returned_text = getTextByContractAddress(ctx_addr) 
+    else:
+        returned_text = 'Wrong Request Method'
+          
+    return returned_text
