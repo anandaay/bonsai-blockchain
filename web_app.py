@@ -5,6 +5,9 @@ p.load_config()
 
 from brownie.project.BrownieDirProject import *
 
+abi = TextStorage.abi
+bytecode = TextStorage.bytecode
+
 
 from flask import Flask
 
@@ -12,4 +15,5 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    debugStr = "<p>Abi: " + str(abi) + "<br>Bytecode: " + str(bytecode) + "</p>"
+    return debugStr
