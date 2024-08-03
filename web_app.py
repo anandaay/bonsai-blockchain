@@ -44,3 +44,18 @@ def getTextByCtxAddr():
         returned_text = 'Wrong Request Method'
           
     return returned_text
+
+@app.route("/get_text_by_hash", methods=['GET'])
+def getTextByHash():
+             
+    returned_text = ''
+    if request.method == 'GET':  
+        hash = request.args['hash']
+        tx_receipt = w3.eth.get_transaction_receipt(hash)
+        print(tx_receipt)
+        ctx_addr = tx_receipt['contractAddress']   
+        returned_text = getTextByContractAddress(ctx_addr) 
+    else:
+        returned_text = 'Wrong Request Method'
+          
+    return returned_text
