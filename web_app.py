@@ -37,9 +37,20 @@ def index():
 def getTextByCtxAddr():
     
     returned_text = ''
+    ctx_addr = ''
     if request.method == 'GET':  
-        ctx_addr = request.args['ctx_addr']
-        returned_text = getTextByContractAddress(ctx_addr) 
+        
+        if request.args['ctx_addr']:
+            ctx_addr = request.args['ctx_addr']
+            
+        elif request.form['ctx_addr']:
+            ctx_addr = request.form['ctx_addr']
+        
+        if ctx_addr is not '':            
+            returned_text = getTextByContractAddress(ctx_addr)
+            
+        else:
+             returned_text = 'Wrong Parameter Input'
     else:
         returned_text = 'Wrong Request Method'
           
@@ -49,12 +60,24 @@ def getTextByCtxAddr():
 def getTextByHash():
              
     returned_text = ''
-    if request.method == 'GET':  
-        hash = request.args['hash']
-        tx_receipt = w3.eth.get_transaction_receipt(hash)
-        print(tx_receipt)
-        ctx_addr = tx_receipt['contractAddress']   
-        returned_text = getTextByContractAddress(ctx_addr) 
+    hash = ''
+    if request.method == 'GET':
+        
+        if request.args['hash']:
+            hash = request.args['hash']
+            
+        elif request.form['hash']:
+            hash = request.form['hash']
+        
+        if hash is not '':
+            
+            tx_receipt = w3.eth.get_transaction_receipt(hash)
+            print(tx_receipt)
+            ctx_addr = tx_receipt['contractAddress']   
+            returned_text = getTextByContractAddress(ctx_addr) 
+            
+        else:
+            returned_text = 'Wrong Parameter Input'
     else:
         returned_text = 'Wrong Request Method'
           
