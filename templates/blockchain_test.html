@@ -37,6 +37,28 @@
                 </div>
             </div>
         </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Get Text From Transaction Hash</h5>
+                    </div>
+                    <div class="card-body">
+                        <form action="/get_text_by_hash" method="get">
+                            <div class="input-group mb-3">
+                                <label class="input-group-text" for="hash_text">Tx Hash :</label>
+                                <input type="text" name="hash" id="hash_text" class="form-control"
+                                    placeholder="Transaction Hash" aria-label="Recipient's username"
+                                    aria-describedby="button-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">Get Text</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script src="static/js/bootstrap.bundle.min.js"></script>
 
