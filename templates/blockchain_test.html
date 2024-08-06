@@ -22,17 +22,16 @@
                         <h5>Get Text From Contract Address</h5>
                     </div>
                     <div class="card-body">
-                        <form action="#">
+                        <form action="/get_text_by_ctx_addr" method="get">
                             <div class="input-group mb-3">
                                 <label class="input-group-text" for="address_text">Address :</label>
-                                <input type="text" name="address" id="address_text" class="form-control"
+                                <input type="text" name="ctx_addr" id="address_text" class="form-control"
                                     placeholder="Contract Address" aria-label="Recipient's username"
                                     aria-describedby="button-addon2">
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button">Get Text</button>
+                                    <button class="btn btn-primary" type="submit">Get Text</button>
                                 </div>
                             </div>
-
                         </form>
                     </div>
                 </div>
