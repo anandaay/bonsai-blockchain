@@ -23,7 +23,7 @@ def getTextByContractAddress(ctx_addr):
     return currentStoredText
 
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 app = Flask(__name__)
 
 @app.route("/")
@@ -32,6 +32,10 @@ def index():
     stored_text = getTextByContractAddress(contract_address)   
     return stored_text
 
+
+@app.route("/blockchain_test")
+def blockchainTest():
+    return render_template('blockchain_test.html')
 
 @app.route("/get_text_by_ctx_addr", methods=['GET'])
 def getTextByCtxAddr():
