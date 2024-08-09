@@ -9,7 +9,7 @@ abi = TextStorage.abi
 bytecode = TextStorage.bytecode
 
 #contract address created after deploying contract
-contract_address = '0x046dc538608FAa4D978FCFcfd3479e9FaE77aE42'
+contract_address = '0x2A7D046d26A4B5816356599cB30D85a22131AF99'
 
 #connect to blockchain server using web3 library
 from web3 import Web3
