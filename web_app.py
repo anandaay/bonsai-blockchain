@@ -192,6 +192,7 @@ def upload_csv():
     plant_id = request.form['plant_id']
     uploaded_file = request.files['csv_file']
     returned_text = ''
+    success = False
 
     if uploaded_file.filename.endswith('.csv'):
         # Process CSV file
@@ -201,13 +202,16 @@ def upload_csv():
         for row in reader:
             data.append(row)
         
-        return jsonify({'plant_id': plant_id, 'data': data})
+        returned_text = jsonify({'plant_id': plant_id, 'data': data})
+        
     else:
-        return jsonify({"An error occurred: ": "File is not a CSV"}), 400
+        returned_text = "An error occurred: File is not a CSV"
 
     error_code = returned_text.find('An error occurred') 
     if returned_text != '' and error_code == -1:
         success = True 
+    
+    return jsonify({'success': success, 'data' : returned_text })
     
 @app.route('/upload_jpg', methods=['POST'])
 def upload_jpg():
