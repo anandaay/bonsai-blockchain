@@ -202,12 +202,12 @@ def upload_csv():
         for row in reader:
             data.append(row)
         
-        returned_text = jsonify({'plant_id': plant_id, 'data': data})
+        returned_text = {'plant_id': plant_id, 'data': data}
         
     else:
         returned_text = "An error occurred: File is not a CSV"
 
-    error_code = returned_text.find('An error occurred') 
+    error_code = str(returned_text).find('An error occurred') 
     if returned_text != '' and error_code == -1:
         success = True 
     
@@ -217,14 +217,22 @@ def upload_csv():
 def upload_jpg():
     plant_id = request.form['plant_id']
     uploaded_file = request.files['jpg_file']
+    returned_text = ''
+    success = False
 
     if uploaded_file.filename.endswith('.jpg') or uploaded_file.filename.endswith('.jpeg'):
         # Process JPG file
         img_stream = io.BytesIO(uploaded_file.read())
         img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
-        return jsonify({'plant_id': plant_id, 'image': img_base64})
+        returned_text = {'plant_id': plant_id, 'image': img_base64}
     else:
-        return jsonify({"An error occurred: ": "File is not a JPG"}), 400
+        returned_text = "An error occurred: File is not a JPG"
+
+    error_code = str(returned_text).find('An error occurred') 
+    if returned_text != '' and error_code == -1:
+        success = True 
+    
+    return jsonify({'success': success, 'data' : returned_text })
 
 @app.route('/check_transaction', methods=['POST'])
 def check_transaction():
