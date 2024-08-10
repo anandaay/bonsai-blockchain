@@ -251,8 +251,36 @@ def upload_jpg():
 
 
 @app.route('/check_transaction', methods=['POST'])
-def check_transaction():
-    transaction_hash = request.form['transaction_hash']
-    # Lakukan proses pengecekan berdasarkan transaction_hash
-    # Misalnya return jsonify({'transaction_hash': transaction_hash, 'status': 'success'})
-    return jsonify({'transaction_hash': transaction_hash, 'status': 'success'})
+def check_transaction():    
+    success = False
+    returned_text = ''
+    hash = request.form['hash']
+    # print(hash)
+    # returned_text = hash
+        
+        
+    if request.method == 'POST': 
+        
+        try:
+                           
+            hash = request.form.get('hash') or request.args.get('hash')
+            
+            if hash != '':
+                returned_text = getTextByTxHash(hash)            
+                                                                
+            else:
+                returned_text = 'An error occurred: Wrong Parameter Input'
+                
+        except Exception as e:
+            print(f"An error occurred: {e}") 
+            returned_text = str(f"An error occurred: {e}")  
+            
+    else:
+        returned_text = 'An error occurred: Wrong Request Method'
+    
+    error_code = returned_text.find('An error occurred') 
+    if returned_text != '' and error_code == -1:
+        success = True  
+             
+    return jsonify({'success': success, 'data' : returned_text})
+        
