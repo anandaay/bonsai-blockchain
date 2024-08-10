@@ -189,7 +189,9 @@ def setTextInContract():
 
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
+    plant_id = request.form['plant_id']
     uploaded_file = request.files['csv_file']
+    returned_text = ''
 
     if uploaded_file.filename.endswith('.csv'):
         # Process CSV file
@@ -198,18 +200,31 @@ def upload_csv():
         reader = csv.DictReader(stream)
         for row in reader:
             data.append(row)
-        return jsonify(data)
+        
+        return jsonify({'plant_id': plant_id, 'data': data})
     else:
         return jsonify({"An error occurred: ": "File is not a CSV"}), 400
 
+    error_code = returned_text.find('An error occurred') 
+    if returned_text != '' and error_code == -1:
+        success = True 
+    
 @app.route('/upload_jpg', methods=['POST'])
 def upload_jpg():
+    plant_id = request.form['plant_id']
     uploaded_file = request.files['jpg_file']
 
     if uploaded_file.filename.endswith('.jpg') or uploaded_file.filename.endswith('.jpeg'):
         # Process JPG file
         img_stream = io.BytesIO(uploaded_file.read())
         img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
-        return jsonify({'image': img_base64})
+        return jsonify({'plant_id': plant_id, 'image': img_base64})
     else:
         return jsonify({"An error occurred: ": "File is not a JPG"}), 400
+
+@app.route('/check_transaction', methods=['POST'])
+def check_transaction():
+    transaction_hash = request.form['transaction_hash']
+    # Lakukan proses pengecekan berdasarkan transaction_hash
+    # Misalnya return jsonify({'transaction_hash': transaction_hash, 'status': 'success'})
+    return jsonify({'transaction_hash': transaction_hash, 'status': 'success'})

@@ -8,30 +8,54 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-5">Upload Files</h1>
+        <h1 class="mt-4">Upload Files</h1>
 
-        <!-- Form untuk CSV -->
-        <div class="mt-4">
-            <h3>Upload CSV</h3>
-            <form action="/upload_csv" method="POST" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="csv_file" class="form-label">Choose a CSV file:</label>
-                    <input type="file" name="csv_file" id="csv_file" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Upload CSV</button>
-            </form>
+        <div class="row mt-4">
+            <!-- Form untuk CSV -->
+            <div class="col-md-6">
+                <h3>Upload CSV</h3>
+                <form action="/upload_csv" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="csv_file" class="form-label">Choose a CSV file:</label>
+                        <input type="file" name="csv_file" id="csv_file" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="plant_id_csv" class="form-label">Plant ID:</label>
+                        <input type="text" name="plant_id" id="plant_id_csv" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload CSV</button>
+                </form>
+            </div>
+
+            <!-- Form untuk JPG -->
+            <div class="col-md-6">
+                <h3>Upload JPG</h3>
+                <form action="/upload_jpg" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="jpg_file" class="form-label">Choose a JPG file:</label>
+                        <input type="file" name="jpg_file" id="jpg_file" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="plant_id_jpg" class="form-label">Plant ID:</label>
+                        <input type="text" name="plant_id" id="plant_id_jpg" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload JPG</button>
+                </form>
+            </div>
         </div>
 
-        <!-- Form untuk JPG -->
-        <div class="mt-4">
-            <h3>Upload JPG</h3>
-            <form action="/upload_jpg" method="POST" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="jpg_file" class="form-label">Choose a JPG file:</label>
-                    <input type="file" name="jpg_file" id="jpg_file" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Upload JPG</button>
-            </form>
+        <!-- Row baru untuk Transaction Hash -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Check Transaction</h3>
+                <form action="/check_transaction" method="POST">
+                    <div class="mb-3">
+                        <label for="transaction_hash" class="form-label">Transaction Hash:</label>
+                        <input type="text" name="transaction_hash" id="transaction_hash" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">Cek Data</button>
+                </form>
+            </div>
         </div>
     </div>
 
