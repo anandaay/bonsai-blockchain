@@ -16,6 +16,9 @@ contract_address = constants.created_contract_address
 from web3 import Web3
 w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
 
+sender_address = constants.sender_account_address
+sender_pk = constants.sender_account_pk
+
 
 def getTextByTxHash(tx_hash):
     returned_text = ''
@@ -63,7 +66,7 @@ def setTextInCtx(ctx_addr, sndr_addr, sndr_pk, value):
         tx = contract.functions.setText(value).build_transaction({
             'from' : sndr_addr,
             'nonce' : w3.eth.get_transaction_count(sndr_addr),
-            'gasPrice': 200000
+            'gasPrice': 1000000
         })
 
         signed_tx = w3.eth.account.sign_transaction(tx, sndr_pk)
@@ -85,6 +88,7 @@ from flask import Flask, request, render_template, jsonify
 import csv
 import base64
 import io
+from PIL import Image
 
 app = Flask(__name__)
 
@@ -202,7 +206,8 @@ def upload_csv():
         for row in reader:
             data.append(row)
         
-        returned_text = {'plant_id': plant_id, 'data': data}
+        storing_data = str({'plant_id': plant_id, 'data': data, 'type' : 'csv'})
+        returned_text = setTextInCtx(contract_address, sender_address, sender_pk, storing_data)
         
     else:
         returned_text = "An error occurred: File is not a CSV"
@@ -213,6 +218,7 @@ def upload_csv():
     
     return jsonify({'success': success, 'data' : returned_text })
     
+    
 @app.route('/upload_jpg', methods=['POST'])
 def upload_jpg():
     plant_id = request.form['plant_id']
@@ -222,9 +228,18 @@ def upload_jpg():
 
     if uploaded_file.filename.endswith('.jpg') or uploaded_file.filename.endswith('.jpeg'):
         # Process JPG file
-        img_stream = io.BytesIO(uploaded_file.read())
+        img = Image.open(uploaded_file)
+        
+        # Ubah ukuran gambar, misalnya menjadi 200x200 pixel (atau sesuai kebutuhan)
+        img = img.resize((200, 200))
+        
+        # Konversi gambar menjadi base64
+        img_stream = io.BytesIO()
+        img.save(img_stream, format="JPEG")
         img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
-        returned_text = {'plant_id': plant_id, 'image': img_base64}
+        
+        storing_data = str({'plant_id': plant_id, 'image': img_base64, 'type' : 'image'})
+        returned_text = setTextInCtx(contract_address, sender_address, sender_pk, storing_data)
     else:
         returned_text = "An error occurred: File is not a JPG"
 
@@ -233,6 +248,7 @@ def upload_jpg():
         success = True 
     
     return jsonify({'success': success, 'data' : returned_text })
+
 
 @app.route('/check_transaction', methods=['POST'])
 def check_transaction():
