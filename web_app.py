@@ -40,14 +40,18 @@ def setTextInCtx(ctx_addr, sndr_addr, sndr_pk, value):
     return tx_receipt['transactionHash'].hex()
 
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
+import csv
+import base64
+import io
+
 app = Flask(__name__)
 
 @app.route("/")
 def index():
     
-    stored_text = getTextByContractAddress(contract_address)   
-    return stored_text
+    # stored_text = getTextByContractAddress(contract_address)   
+    return render_template('index.html')
 
 
 @app.route("/blockchain_test")
@@ -138,4 +142,30 @@ def setTextInContract():
 
     print(returned_text)
     return returned_text
-    
+
+@app.route('/upload_csv', methods=['POST'])
+def upload_csv():
+    uploaded_file = request.files['csv_file']
+
+    if uploaded_file.filename.endswith('.csv'):
+        # Process CSV file
+        data = []
+        stream = io.StringIO(uploaded_file.stream.read().decode("UTF8"), newline=None)
+        reader = csv.DictReader(stream)
+        for row in reader:
+            data.append(row)
+        return jsonify(data)
+    else:
+        return jsonify({"error": "File is not a CSV"}), 400
+
+@app.route('/upload_jpg', methods=['POST'])
+def upload_jpg():
+    uploaded_file = request.files['jpg_file']
+
+    if uploaded_file.filename.endswith('.jpg') or uploaded_file.filename.endswith('.jpeg'):
+        # Process JPG file
+        img_stream = io.BytesIO(uploaded_file.read())
+        img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
+        return jsonify({'image': img_base64})
+    else:
+        return jsonify({"error": "File is not a JPG"}), 400
