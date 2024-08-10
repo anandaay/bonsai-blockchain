@@ -96,11 +96,27 @@ def getTextByHash():
         
         if hash is not '':
             
-            tx_receipt = w3.eth.get_transaction_receipt(hash)
-            print(tx_receipt)
-            #ctx_addr = tx_receipt['contractAddress']
-            ctx_addr = tx_receipt['to']     
-            returned_text = getTextByContractAddress(ctx_addr) 
+            try :      
+                tx = w3.eth.get_transaction(hash)
+                ctx_addr = tx['to']    
+                contract = w3.eth.contract(address=ctx_addr, abi=abi)
+
+                tx_receipt = w3.eth.get_transaction_receipt(hash)                
+                        
+                if tx_receipt.status == 1:
+                # Proses log acara dari transaksi tersebut
+                    for log in tx_receipt.logs:
+                        # Periksa apakah log acara terkait dengan event TextChanged
+                        if log.address == ctx_addr:                
+                            # Dekode data dari log acara
+                            decoded_log = contract.events.TextChanged().process_log(log)                
+                            returned_text = decoded_log['args']['newText']                                                                                             
+                        else:
+                            returned_text = "Wrong Contract Address"                                
+                                                    
+                print(returned_text)
+            except Exception as e:
+                print(f"An error occurred: {e}")                
             
         else:
             returned_text = 'Wrong Parameter Input'
