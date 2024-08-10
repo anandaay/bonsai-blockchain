@@ -250,19 +250,15 @@ def upload_jpg():
     return jsonify({'success': success, 'data' : returned_text })
 
 
-@app.route('/check_transaction', methods=['POST'])
-def check_transaction():    
+@app.route('/check_hash', methods=['POST'])
+def check_hash():    
     success = False
     returned_text = ''
-    hash = request.form['hash']
-    # print(hash)
-    # returned_text = hash
-        
-        
+    hash = ''
+                
     if request.method == 'POST': 
         
-        try:
-                           
+        try:                           
             hash = request.form.get('hash') or request.args.get('hash')
             
             if hash != '':
