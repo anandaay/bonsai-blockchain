@@ -231,7 +231,7 @@ def upload_jpg():
         img = Image.open(uploaded_file)
         
         # Ubah ukuran gambar, misalnya menjadi 200x200 pixel (atau sesuai kebutuhan)
-        img = img.resize((200, 200))
+        img = img.resize((100, 100))
         
         # Konversi gambar menjadi base64
         img_stream = io.BytesIO()
