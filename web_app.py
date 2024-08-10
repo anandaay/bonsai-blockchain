@@ -35,36 +35,50 @@ def getTextByTxHash(tx_hash):
                     decoded_log = contract.events.TextChanged().process_log(log)                
                     returned_text = decoded_log['args']['newText']
                     break                                                    
-                                            
-        print(returned_text)
+        else:
+            returned_text = 'An error occurred: Transaction Receipt Not Found'                                                    
         
     except Exception as e:
-        print(f"An error occurred: {e}")         
+        print(f"An error occurred: {e}") 
+        returned_text = str(f"An error occurred: {e}")       
         
     return returned_text
 
 def getTextByContractAddress(ctx_addr):
-    targetContract = w3.eth.contract(address=ctx_addr, abi=abi)
-    currentStoredText = targetContract.functions.getText().call() #getText function from contract
-
-    print(currentStoredText)
-    return currentStoredText
+   
+    returned_text = ''
+    try:
+        targetContract = w3.eth.contract(address=ctx_addr, abi=abi)
+        returned_text = targetContract.functions.getText().call() #getText function from contract
+    except Exception as e:
+        print(f"An error occurred: {e}") 
+        returned_text = str(f"An error occurred: {e}")  
+    
+    return returned_text
 
 def setTextInCtx(ctx_addr, sndr_addr, sndr_pk, value):
-    contract = w3.eth.contract(address=ctx_addr, abi=abi)
-    tx = contract.functions.setText(value).build_transaction({
-        'from' : sndr_addr,
-        'nonce' : w3.eth.get_transaction_count(sndr_addr),
-        'gasPrice': 200000
-    })
+    hashResult = ''
+    try:
+        contract = w3.eth.contract(address=ctx_addr, abi=abi)
+        tx = contract.functions.setText(value).build_transaction({
+            'from' : sndr_addr,
+            'nonce' : w3.eth.get_transaction_count(sndr_addr),
+            'gasPrice': 200000
+        })
 
-    signed_tx = w3.eth.account.sign_transaction(tx, sndr_pk)
-    tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+        signed_tx = w3.eth.account.sign_transaction(tx, sndr_pk)
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+        tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
-    print(tx_receipt)       
+        print(tx_receipt)      
+        hashResult = tx_receipt['transactionHash'].hex()
+        
+    except Exception as e:
+        print(f"An error occurred: {e}") 
+        hashResult = str(f"An error occurred: {e}")    
+     
     
-    return tx_receipt['transactionHash'].hex()
+    return hashResult
 
 
 from flask import Flask, request, render_template, jsonify
@@ -75,11 +89,8 @@ import io
 app = Flask(__name__)
 
 @app.route("/")
-def index():
-    
-    # stored_text = getTextByContractAddress(contract_address)   
+def index():  
     return render_template('index.html')
-
 
 @app.route("/blockchain_test")
 def blockchainTest():
@@ -87,7 +98,7 @@ def blockchainTest():
 
 @app.route("/get_text_by_ctx_addr", methods=['GET'])
 def getTextByCtxAddr():
-    
+    success = False    
     returned_text = ''
     ctx_addr = ''
     if request.method == 'GET':  
@@ -99,18 +110,22 @@ def getTextByCtxAddr():
             ctx_addr = request.form['ctx_addr']
         
         if ctx_addr != '':            
-            returned_text = getTextByContractAddress(ctx_addr)
+            returned_text = getTextByContractAddress(ctx_addr)           
             
         else:
-             returned_text = 'Wrong Parameter Input'
+             returned_text = 'An error occurred: Wrong Parameter Input'
     else:
-        returned_text = 'Wrong Request Method'
-          
-    return returned_text
+        returned_text = 'An error occurred: Wrong Request Method'
+    
+    error_code = returned_text.find('An error occurred') 
+    if returned_text != '' and error_code == -1:
+        success = True          
+    
+    return jsonify({'success': success, 'data' : returned_text, 'error_code' : error_code })
 
 @app.route("/get_text_by_hash", methods=['GET'])
 def getTextByHash():
-             
+    success = False
     returned_text = ''
     hash = ''
     if request.method == 'GET':
@@ -122,24 +137,28 @@ def getTextByHash():
             hash = request.form['hash']
         
         if hash != '':
-            returned_text = getTextByTxHash(hash)
+            returned_text = getTextByTxHash(hash)            
                                                               
         else:
-            returned_text = 'Wrong Parameter Input'
+            returned_text = 'An error occurred: Wrong Parameter Input'
     else:
-        returned_text = 'Wrong Request Method'
-          
-    return returned_text
+        returned_text = 'An error occurred: Wrong Request Method'
+    
+    error_code = returned_text.find('An error occurred') 
+    if returned_text != '' and error_code == -1:
+        success = True  
+             
+    return jsonify({'success': success, 'data' : returned_text})
 
 @app.route("/set_text_in_ctx_addr", methods=['GET'])
 def setTextInContract():
+    success = False
     returned_text = ''
     ctx_addr = ''
     sender_address = ''
     sender_pk = ''
     value = ''
-    hash = ''
-    # print(request.method)
+
     if request.method == 'GET':
         if request.args['ctx_addr']:
             sender_address = request.args['sender_address']
@@ -154,16 +173,19 @@ def setTextInContract():
             value = request.form['value']  
         
         if ctx_addr != '':                                 
-            returned_text = setTextInCtx(ctx_addr, sender_address, sender_pk, value)
+            returned_text = setTextInCtx(ctx_addr, sender_address, sender_pk, value)           
             
         else:
-            returned_text = 'Wrong Parameter Input'
+            returned_text = 'An error occurred: Wrong Parameter Input'
                 
     else:
-        returned_text = 'error'
-
-    print(returned_text)
-    return returned_text
+        returned_text = 'An error occurred: Wrong Request Method'
+    
+    error_code = returned_text.find('An error occurred') 
+    if returned_text != '' and error_code == -1:
+        success = True  
+    
+    return jsonify({'success': success, 'data' : returned_text })
 
 @app.route('/upload_csv', methods=['POST'])
 def upload_csv():
@@ -178,7 +200,7 @@ def upload_csv():
             data.append(row)
         return jsonify(data)
     else:
-        return jsonify({"error": "File is not a CSV"}), 400
+        return jsonify({"An error occurred: ": "File is not a CSV"}), 400
 
 @app.route('/upload_jpg', methods=['POST'])
 def upload_jpg():
@@ -190,4 +212,4 @@ def upload_jpg():
         img_base64 = base64.b64encode(img_stream.getvalue()).decode('utf-8')
         return jsonify({'image': img_base64})
     else:
-        return jsonify({"error": "File is not a JPG"}), 400
+        return jsonify({"An error occurred: ": "File is not a JPG"}), 400
