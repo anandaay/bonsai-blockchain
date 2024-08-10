@@ -16,6 +16,33 @@ contract_address = constants.created_contract_address
 from web3 import Web3
 w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
 
+
+def getTextByTxHash(tx_hash):
+    returned_text = ''
+    try :      
+        tx = w3.eth.get_transaction(tx_hash)
+        ctx_addr = tx['to']    
+        contract = w3.eth.contract(address=ctx_addr, abi=abi)
+
+        tx_receipt = w3.eth.get_transaction_receipt(tx_hash)                
+                
+        if tx_receipt.status == 1:
+        # Proses log acara dari transaksi tersebut
+            for log in tx_receipt.logs:
+                # Periksa apakah log acara terkait dengan event TextChanged
+                if log.address == ctx_addr:                
+                    # Dekode data dari log acara
+                    decoded_log = contract.events.TextChanged().process_log(log)                
+                    returned_text = decoded_log['args']['newText']
+                    break                                                    
+                                            
+        print(returned_text)
+        
+    except Exception as e:
+        print(f"An error occurred: {e}")         
+        
+    return returned_text
+
 def getTextByContractAddress(ctx_addr):
     targetContract = w3.eth.contract(address=ctx_addr, abi=abi)
     currentStoredText = targetContract.functions.getText().call() #getText function from contract
@@ -71,7 +98,7 @@ def getTextByCtxAddr():
         elif request.form['ctx_addr']:
             ctx_addr = request.form['ctx_addr']
         
-        if ctx_addr is not '':            
+        if ctx_addr != '':            
             returned_text = getTextByContractAddress(ctx_addr)
             
         else:
@@ -94,30 +121,9 @@ def getTextByHash():
         elif request.form['hash']:
             hash = request.form['hash']
         
-        if hash is not '':
-            
-            try :      
-                tx = w3.eth.get_transaction(hash)
-                ctx_addr = tx['to']    
-                contract = w3.eth.contract(address=ctx_addr, abi=abi)
-
-                tx_receipt = w3.eth.get_transaction_receipt(hash)                
-                        
-                if tx_receipt.status == 1:
-                # Proses log acara dari transaksi tersebut
-                    for log in tx_receipt.logs:
-                        # Periksa apakah log acara terkait dengan event TextChanged
-                        if log.address == ctx_addr:                
-                            # Dekode data dari log acara
-                            decoded_log = contract.events.TextChanged().process_log(log)                
-                            returned_text = decoded_log['args']['newText']                                                                                             
-                        else:
-                            returned_text = "Wrong Contract Address"                                
-                                                    
-                print(returned_text)
-            except Exception as e:
-                print(f"An error occurred: {e}")                
-            
+        if hash != '':
+            returned_text = getTextByTxHash(hash)
+                                                              
         else:
             returned_text = 'Wrong Parameter Input'
     else:
@@ -147,7 +153,7 @@ def setTextInContract():
             sender_pk = request.form['sender_pk']    
             value = request.form['value']  
         
-        if ctx_addr is not '':                                 
+        if ctx_addr != '':                                 
             returned_text = setTextInCtx(ctx_addr, sender_address, sender_pk, value)
             
         else:
