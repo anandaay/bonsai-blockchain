@@ -19,6 +19,8 @@ w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
 sender_address = constants.sender_account_address
 sender_pk = constants.sender_account_pk
 
+web_url = 'http://127.0.0.1/bonsai'
+
 
 def getTextByTxHash(tx_hash):
     returned_text = ''
@@ -74,7 +76,7 @@ def setTextInCtx(ctx_addr, sndr_addr, sndr_pk, value):
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
         print(tx_receipt)      
-        hashResult = tx_receipt['transactionHash'].hex()
+        hashResult = tx_receipt['transactionHash'].hex()       
         
     except Exception as e:
         print(f"An error occurred: {e}") 
@@ -89,6 +91,7 @@ import csv
 import base64
 import io
 from PIL import Image
+import requests
 
 app = Flask(__name__)
 
@@ -209,6 +212,17 @@ def upload_csv():
         storing_data = str({'plant_id': plant_id, 'data': data, 'type' : 'csv'})
         returned_text = setTextInCtx(contract_address, sender_address, sender_pk, storing_data)
         
+        if str(returned_text).find('An error occurred') == -1:
+            response = requests.get(
+                web_url,
+                params={
+                    'plant_id': plant_id,
+                    'hash': returned_text,
+                    'type': 'csv'
+                }
+            )
+            print(response.text)
+        
     else:
         returned_text = "An error occurred: File is not a CSV"
 
@@ -240,6 +254,17 @@ def upload_jpg():
         
         storing_data = str({'plant_id': plant_id, 'image': img_base64, 'type' : 'image'})
         returned_text = setTextInCtx(contract_address, sender_address, sender_pk, storing_data)
+        
+        if str(returned_text).find('An error occurred') == -1:
+            response = requests.get(
+                web_url,
+                params={
+                    'plant_id': plant_id,
+                    'hash': returned_text,
+                    'type': 'image'
+                }
+            )
+            print(response.text)
     else:
         returned_text = "An error occurred: File is not a JPG"
 
