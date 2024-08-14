@@ -212,16 +212,20 @@ def upload_csv():
         storing_data = str({'plant_id': plant_id, 'data': data, 'type' : 'csv'})
         returned_text = setTextInCtx(contract_address, sender_address, sender_pk, storing_data)
         
-        if str(returned_text).find('An error occurred') == -1:
-            response = requests.get(
-                web_url,
-                params={
-                    'plant_id': plant_id,
-                    'hash': returned_text,
-                    'type': 'csv'
-                }
-            )
-            print(response.text)
+        try:
+            if str(returned_text).find('An error occurred') == -1:
+                response = requests.get(
+                    web_url,
+                    params={
+                        'plant_id': plant_id,
+                        'hash': returned_text,
+                        'type': 'csv'
+                    }
+                )
+                print(response.text)
+        except Exception as e:
+            print('URL not valid')
+            print(f"An error occurred: {e}") 
         
     else:
         returned_text = "An error occurred: File is not a CSV"
@@ -255,16 +259,21 @@ def upload_jpg():
         storing_data = str({'plant_id': plant_id, 'image': img_base64, 'type' : 'image'})
         returned_text = setTextInCtx(contract_address, sender_address, sender_pk, storing_data)
         
-        if str(returned_text).find('An error occurred') == -1:
-            response = requests.get(
-                web_url,
-                params={
-                    'plant_id': plant_id,
-                    'hash': returned_text,
-                    'type': 'image'
-                }
-            )
+        try:                    
+            if str(returned_text).find('An error occurred') == -1:
+                response = requests.get(
+                    web_url,
+                    params={
+                        'plant_id': plant_id,
+                        'hash': returned_text,
+                        'type': 'image'
+                    }
+                )
             print(response.text)
+        except Exception as e:
+            print('URL not valid')
+            print(f"An error occurred: {e}") 
+            
     else:
         returned_text = "An error occurred: File is not a JPG"
 
