@@ -19,7 +19,7 @@ w3 = Web3(Web3.HTTPProvider('http://127.0.0.1:8545'))
 sender_address = constants.sender_account_address
 sender_pk = constants.sender_account_pk
 
-web_url = 'http://127.0.0.1/bonsai'
+web_url = 'http://127.0.0.1:8000/api/add-blockchain'
 
 
 def getTextByTxHash(tx_hash):
@@ -87,6 +87,7 @@ def setTextInCtx(ctx_addr, sndr_addr, sndr_pk, value):
 
 
 from flask import Flask, request, render_template, jsonify
+from flask_cors import CORS
 import csv
 import base64
 import io
@@ -94,6 +95,7 @@ from PIL import Image
 import requests
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/")
 def index():  
