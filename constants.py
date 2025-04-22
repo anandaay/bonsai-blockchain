@@ -1,1 +1,4 @@
-created_contract_address = '0x2A7D046d26A4B5816356599cB30D85a22131AF99' 
+created_contract_address = '0xeee1F0d625f54B021b1D94e9420e1AF766c59a4A'
+sender_account_address = '0x90A3E8D78C47ad155968a3cB91480d8259F61071'
+sender_account_pk = '26841f9820ac08293a9aa1103dc07ee62f004cf003e3311be89ee3eb7d2690ba'
+ 
